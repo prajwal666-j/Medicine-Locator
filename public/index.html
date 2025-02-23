@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Locator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-gradient">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="https://static.vecteezy.com/system/resources/thumbnails/013/218/336/small_2x/herbal-capsule-pill-leaf-medicine-logo-icon-illustration-template-capsule-pharmacy-medical-logo-template-free-vector.jpg" alt="" width="50" height="50" class="d-inline-block align-text-top">
+                Medicine Locator
+            </a>
+            <div class="navbar-text mx-auto">
+                <h4 class="mb-0">Search Where Am I</h4>
+            </div>
+            <div class="navbar-brand invisible">
+                <img src="logo.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+                Medicine Locator
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Find Your Medicine</h1>
+        <div class="search-box position-relative">
+            <div class="input-group">
+                <input type="text" id="medicineName" class="form-control" placeholder="🔍 Search for medicine...">
+                <button class="btn btn-primary" onclick="searchMedicine()">Search</button>
+            </div>
+            <div id="suggestions" class="suggestions"></div> <!-- Suggestions box -->
+        </div>
+
+        <div id="result"></div>
+
+        <button class="btn btn-primary mt-5" onclick="openAddMedicineForm()">Add Medicine</button>
+
+        <!-- Add Medicine Form -->
+        <div id="addMedicineForm" class="mt-5" style="display: none;">
+            <h3>Add New Medicine</h3>
+            <div class="mb-3">
+                <input type="text" id="newMedicineName" class="form-control" placeholder="Medicine Name">
+            </div>
+            <div class="mb-3">
+                <input type="text" id="newMedicineRow" class="form-control" placeholder="Row">
+            </div>
+            <div class="mb-3">
+                <input type="text" id="newMedicineRack" class="form-control" placeholder="Rack">
+            </div>
+            <button class="btn btn-success" onclick="addMedicine()">Add</button>
+        </div>
+
+        <!-- Medicine Table -->
+        <!-- Medicine Table -->
+                <!-- Medicine Table -->
+        <h2 class="mt-5 mb-3">Medicine Distribution</h2>
+        <table class="table table-bordered medicine-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Rack 1</th>
+                    <th>Rack 2</th>
+                    <th>Rack 3</th>
+                    <th>Rack 4</th>
+                    <th>Rack 5</th>
+                </tr>
+            </thead>
+            <tbody id="medicineTableBody">
+                <!-- Rows will be populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5 bg-gradient text-white text-center py-4">
+        <div class="container">
+            <p class="mb-0">&copy; 2023 Medicine Locator. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
