@@ -1,24 +1,25 @@
 const express = require('express');
-const mysql = require('mysql2'); // Import mysql2 once
-const cors = require('cors');
+const mysql = require('mysql2');
 const bodyParser = require('body-parser');
+const cors = require('cors');
+const path = require('path'); // For serving static files
 
 const app = express();
 const port = 5000;
 
 // Middleware
-app.use(cors());
 app.use(bodyParser.json());
+app.use(cors());
 
-// Serve static files from the 'public' folder
-app.use(express.static('public'));
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, 'public')));
 
-// MySQL connection
+// MySQL Database Connection
 const db = mysql.createConnection({
-    host: 'localhost', // Replace with your MySQL host
-    user: 'root',      // Replace with your MySQL username
+    host: 'localhost',
+    user: 'root', // Replace with your MySQL username
     password: 'Uijwal@7', // Replace with your MySQL password
-    database: 'medicine_locator' // Replace with your database name
+    database: 'medicine_locator', // Replace with your database name
 });
 
 db.connect((err) => {
@@ -29,48 +30,79 @@ db.connect((err) => {
     }
 });
 
-// API to search for medicine
+// API to Fetch All Medicines
 app.get('/api/medicines', (req, res) => {
-    const { name } = req.query;
-    let query = 'SELECT * FROM medicines';
-    let queryParams = [];
-
-    if (name) {
-        query += ' WHERE name LIKE ?';
-        queryParams.push(`%${name}%`);
-    }
-
-    console.log('Executing Query:', query); // Log the query
-    console.log('Query Parameters:', queryParams); // Log the parameters
-
-    db.query(query, queryParams, (err, results) => {
+    const query = 'SELECT * FROM medicines';
+    db.query(query, (err, results) => {
         if (err) {
-            console.error('Database Error:', err); // Log the error
-            return res.status(500).json({ error: 'Database error', details: err.message });
+            console.error('Error fetching medicines:', err);
+            return res.status(500).json({ error: 'Database error' });
         }
         res.json(results);
     });
 });
 
-// API to add a new medicine
-app.post('/api/medicines', (req, res) => {
-    const { name, row, rack } = req.body;
-
-    // Validate input
-    if (!name || !row || !rack) {
-        return res.status(400).json({ error: 'All fields (name, row, rack) are required' });
+// API to Search Medicines by Name
+app.get('/api/medicines/search', (req, res) => {
+    const { name } = req.query;
+    if (!name) {
+        return res.status(400).json({ error: 'Name parameter is required' });
     }
 
-    // Insert into the database
-    const query = 'INSERT INTO medicines (name, row_number, rack) VALUES (?, ?, ?)'; // Use row_number
-    db.query(query, [name, row, rack], (err, results) => {
+    const query = 'SELECT * FROM medicines WHERE name LIKE ?';
+    db.query(query, [`%${name}%`], (err, results) => {
         if (err) {
-            console.error('Error adding medicine:', err); // Log the error
-            return res.status(500).json({ error: 'Database error', details: err.message });
+            console.error('Error searching medicines:', err);
+            return res.status(500).json({ error: 'Database error' });
         }
+        res.json(results);
+    });
+});
+
+app.post('/api/medicines', (req, res) => {
+    const { name, row_num, rack } = req.body;
+
+    if (!name || !row_num || !rack) {
+        console.log("Missing fields:", req.body);
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const query = 'INSERT INTO medicines (name, row_num, rack) VALUES (?, ?, ?)';
+    db.query(query, [name, row_num, rack], (err, results) => {
+        if (err) {
+            console.error('Error adding medicine:', err);
+            return res.status(500).json({ error: 'Database error', details: err });
+        }
+        console.log("Insert Success:", results);
         res.json({ message: 'Medicine added successfully', id: results.insertId });
     });
 });
+
+
+// Serve the index.html file for the root URL
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// API to Delete a Medicine by Name
+// API to Delete a Medicine by Name
+app.delete('/api/medicines/:name', (req, res) => {
+    const { name } = req.params;
+    
+    const query = 'DELETE FROM medicines WHERE name = ?';
+    db.query(query, [name], (err, results) => {
+        if (err) {
+            console.error('Error deleting medicine:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ error: 'Medicine not found' });
+        }
+        res.json({ message: 'Medicine deleted successfully' });
+    });
+});
+
+ 
 
 // Start the server
 app.listen(port, () => {
